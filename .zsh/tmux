@@ -1,0 +1,5 @@
+# autoattach to a tmux session, if exists
+[[ -e "$HOME/.tmuxa-session" ]] && [[ -z "$TMUX" ]] && tmuxa latest
+
+alias tmux='tmux -u -2'
+alias tmuxl='tmux list-sessions'
