@@ -1,4 +1,4 @@
 # autoattach to a tmux session, if exists
-[[ -z "$TMUX" ]] && tmux attach
+[[ -z "$TMUX" ]] && tmuxa latest 2>/dev/null
 
 alias tmuxl='tmux list-sessions'

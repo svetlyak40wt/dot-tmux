@@ -1,0 +1,101 @@
+#!/usr/bin/env python
+
+"""
+This is a wrapper around tmux binary.
+It does a few things:
+
+- have only one argument - session name to connect to
+  if such session does not exists, it outputs a list
+  of available sessions
+- there are two special argument names: latest and list.
+  If 'latest' was given, then tmuxa looks into the ~/.tmuxa-session
+  file, created either by itself, nor by choose-session special
+  binding (C-q s, look into the .tmux.conf).
+  If 'list' was given, then tmuxa just output a list of available sessions.
+
+Note: command latest works only if there isn't any client already connected
+to this session. This needed to exclude cases when you open two
+connections to the server, and both of them are connected to the same
+session.
+For same reason, command list omit already attached sessions.
+"""
+
+import os
+import sys
+from subprocess import Popen, PIPE
+
+
+CONFIG = os.path.expanduser('~/.tmuxa-session')
+
+
+LatestNotFound = object()
+
+
+def main():
+    result = Popen(['tmux', 'list-sessions', '-F', '#{session_name} #{session_attached}'],
+                   stdout=PIPE, stderr=PIPE).communicate()[0]
+    sessions = [line.split(' ', 1)
+                for line in filter(None, result.split('\n'))]
+    sessions = [(name, bool(int(attached)))
+                for name, attached in sessions]
+    unattached_sessions = [name
+                           for name, attached in sessions
+                           if not attached]
+
+    session = None
+
+    if len(sys.argv) > 1:
+        command = sys.argv[1]
+        if command == 'list':
+            if unattached_sessions:
+                sys.stdout.write(
+                    'Available sessions: {0}\n'.format(
+                        ', '.join(unattached_sessions)))
+            else:
+                sys.stderr.write('There isn\'t any unattached sessions\n')
+            sys.exit(1)
+            
+        elif command == 'latest':
+            try:
+                with open(CONFIG) as f:
+                    session = f.readline().strip()
+                found = [name
+                         for name in unattached_sessions
+                         if name.startswith(session)]
+                if found:
+                    assert len(found) == 1, 'Found more than 1 session with name starting with "{0}"'.format(session)
+                    session = found[0]
+                else:
+                    sys.stderr.write(
+                        'There is no session starting with "{0}" or it is already attached\n'.format(
+                            session))
+                    session = LatestNotFound
+            except IOError:
+                sys.stderr.write(
+                    'There is no latest session info in {0}\n'.format(
+                        CONFIG))
+                sys.exit(1)
+        else:
+            session = command
+    else:
+        if len(unattached_sessions) == 1:
+            session = unattached_sessions[0]
+        else:
+            sys.stderr.write(
+                'Please, choose from available sessions: {0}\n'.format(
+                    ', '.join(unattached_sessions)))
+            sys.exit(1)
+
+    if session is LatestNotFound:
+        pass
+    elif session is None:
+        os.system('tmux')
+    else:
+        with open(CONFIG, 'w') as f:
+            f.write(session)
+
+        os.system('tmux attach -t ' + session)
+
+
+if __name__ == '__main__':
+    main()
