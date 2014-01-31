@@ -18,4 +18,6 @@ command `latest`, to connect to the last used tmux session. The `latest`
 command is useful, when you want to autostart tmux after the first ssh
 connection to the server. That is just what `.zsh/tmux` does.
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/svetlyak40wt/dot-tmux/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 [dotfiler]: https://github.com/svetlyak40wt/dotfiler
