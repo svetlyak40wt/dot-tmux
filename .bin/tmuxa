@@ -80,7 +80,7 @@ def main():
     else:
         if len(unattached_sessions) == 1:
             session = unattached_sessions[0]
-        else:
+        elif len(unattached_sessions) > 1:
             sys.stderr.write(
                 'Please, choose from available sessions: {0}\n'.format(
                     ', '.join(unattached_sessions)))
