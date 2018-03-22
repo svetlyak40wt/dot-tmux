@@ -1,3 +1,8 @@
+0.3.0
+-----
+
+* Fixes to improve Emacs behaviour.
+
 0.2.0
 -----
 
