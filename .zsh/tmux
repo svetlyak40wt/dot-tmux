@@ -1,4 +1,5 @@
 # autoattach to a tmux session, if exists
-[[ -z "$TMUX" ]] && tmuxa latest 2>/dev/null
+# В апреле 2021 эта команда начала зависать
+# [[ -z "$TMUX" ]] && tmuxa latest 2>/dev/null
 
-alias tmuxl='tmux list-sessions'
+#alias tmuxl='tmux list-sessions'
