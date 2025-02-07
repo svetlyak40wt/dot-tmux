@@ -33,7 +33,7 @@ LatestNotFound = object()
 
 def main():
     result = Popen(['tmux', 'list-sessions', '-F', '#{session_name} #{session_attached}'],
-                   stdout=PIPE, stderr=PIPE).communicate()[0]
+                   stdout=PIPE, stderr=PIPE, encoding='utf-8').communicate()[0]
     sessions = [line.split(' ', 1)
                 for line in filter(None, result.split('\n'))]
     sessions = [(name, bool(int(attached)))
